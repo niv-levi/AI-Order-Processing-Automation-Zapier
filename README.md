@@ -91,6 +91,27 @@ flowchart TD
     L -. error .-> N
 ```
 
+
+## Screenshots
+
+### Zapier workflow
+
+The main workflow receives the order, processes each line item, blocks duplicates, extracts customization details with AI, validates the result, and routes the item to the correct next step.
+
+![Zapier workflow](screenshots/zapier-workflow.svg)
+
+### ClickUp production task
+
+When all required customization details are present, the workflow creates a production task in ClickUp automatically.
+
+![ClickUp production task](screenshots/clickup-production-task.svg)
+
+### Slack review notification
+
+If required information is missing, the item is not sent to production. Instead, a message is sent to the `#order-review` Slack channel with the missing fields and validation reason.
+
+![Slack review notification](screenshots/slack-review-notification.svg)
+
 ## Tools used
 
 - Zapier
