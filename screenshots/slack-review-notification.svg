@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900">
+  <rect width="1400" height="900" fill="#1f2937"/>
+  <style>
+    .title{font:700 36px Arial,sans-serif;fill:#fff}
+    .h{font:700 22px Arial,sans-serif;fill:#fff}
+    .t{font:400 20px Arial,sans-serif;fill:#e5e7eb}
+    .m{font:400 17px Arial,sans-serif;fill:#cbd5e1}
+  </style>
+  <rect x="0" y="0" width="280" height="900" fill="#3f0e40"/>
+  <text x="42" y="68" class="title">Niv</text>
+  <text x="42" y="150" class="m">Channels</text>
+  <text x="42" y="198" class="t"># all-niv</text>
+  <text x="42" y="240" class="t"># new-channel</text>
+  <rect x="22" y="265" width="236" height="48" rx="8" fill="#7c3aed"/>
+  <text x="42" y="297" class="t"># order-review</text>
+  <text x="42" y="352" class="t"># social</text>
+
+  <rect x="280" y="0" width="1120" height="90" fill="#111827"/>
+  <text x="325" y="57" class="title"># order-review</text>
+
+  <rect x="330" y="135" width="1010" height="680" rx="18" fill="#111827" stroke="#374151" stroke-width="2"/>
+  <text x="375" y="185" class="h">🚨 Order Item Requires Review</text>
+
+  <text x="375" y="240" class="h">Order Details</text>
+  <text x="405" y="278" class="t">• Order ID: ORD-1003</text>
+  <text x="405" y="314" class="t">• Line Item ID: LI-3001</text>
+  <text x="405" y="350" class="t">• Product: Custom Bracelet</text>
+  <text x="405" y="386" class="t">• SKU: BRAC-002</text>
+
+  <text x="375" y="455" class="h">Original Customization Notes</text>
+  <rect x="375" y="478" width="860" height="58" rx="10" fill="#1f2937" stroke="#4b5563"/>
+  <text x="405" y="515" class="t">Gold, engraving Dana</text>
+
+  <text x="375" y="600" class="h">Validation Details</text>
+  <text x="405" y="642" class="t">• Missing Fields: size</text>
+  <text x="405" y="680" class="t">• Validation Reason: Missing required fields: size</text>
+
+  <rect x="375" y="735" width="860" height="54" rx="10" fill="#1f2937" stroke="#f59e0b" stroke-width="3"/>
+  <text x="405" y="770" class="t">Please review and update if needed.</text>
+</svg>
