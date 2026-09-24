@@ -1,0 +1,13 @@
+{
+  "order_id": "ORD-1003",
+  "payment_status": "paid",
+  "items": [
+    {
+      "line_item_id": "LI-3001",
+      "product_name": "Custom Bracelet",
+      "sku": "BRAC-002",
+      "quantity": 1,
+      "customization_notes": "Gold, engraving Dana"
+    }
+  ]
+}
