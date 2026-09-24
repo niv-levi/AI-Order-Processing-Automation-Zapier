@@ -1,49 +1,63 @@
 # AI Order Processing Automation
 
-A Zapier workflow that processes custom e-commerce orders automatically.
+A Zapier workflow for processing custom e-commerce orders with AI.
 
-It receives an order through a webhook, checks each item separately, extracts customization details with AI, validates the data, and sends the order to the right next step.
+The workflow receives an order, checks each item, extracts customization details from free-text notes, validates the result, and sends the item to the right next step.
 
-If the order is complete, a production task is created in ClickUp. If information is missing, the order is sent to Slack for manual review.
+- Complete order → create a production task in ClickUp
+- Missing information → send the order to Slack for manual review
+- Duplicate item → stop before AI processing
+- Failed action → mark the item as `failed`
 
-## Why I built it
+## The problem
 
-Custom orders often include free-text notes such as:
-
-```text
-Silver, 45cm, engraving NIV, gift box
-```
-
-Someone usually has to read the note, understand the requested options, check if anything is missing, create a production task, and notify the team.
-
-This workflow automates most of that process.
-
-For a store that handles many custom orders, it can save a few minutes per order and reduce repetitive manual work.
-
-## How it works
-
-1. An order is received through a webhook.
-2. Each line item is processed separately.
-3. A unique key is created from the order ID and line item ID.
-4. Zapier Tables checks if the item was already processed.
-5. Duplicate items are stopped before AI processing.
-6. AI extracts the customization details from the customer notes.
-7. A validation step checks that the required fields are present.
-8. The item is routed based on the result:
-   - `approved` → create a production task in ClickUp
-   - `needs_review` → send a Slack message for human review
-9. The final status is stored in Zapier Tables.
-10. Native error handlers mark failed runs as `failed`.
-
-## Example
-
-Input:
+Custom orders often contain notes like:
 
 ```text
 Silver, 45cm, engraving NIV, gift box
 ```
 
-AI output:
+Without automation, someone may need to:
+
+- read the customer note
+- understand the requested options
+- check if anything is missing
+- create a production task
+- notify the team
+- make sure the same item was not processed twice
+
+This workflow handles most of that automatically.
+
+## What it does
+
+1. Receives order data through a webhook.
+2. Loops through each line item.
+3. Creates a unique key from `order_id + line_item_id`.
+4. Checks Zapier Tables to see if the item was already processed.
+5. Stops duplicate items.
+6. Sends the customization note to AI.
+7. Extracts:
+   - material
+   - size
+   - engraving
+   - gift box
+   - extraction confidence
+8. Validates the required fields.
+9. Updates the order record.
+10. Routes the item:
+   - `approved` → ClickUp
+   - `needs_review` → Slack
+11. Uses native error handlers for AI, ClickUp, and Slack failures.
+
+## Example 1 – approved order
+
+Customer note:
+
+```text
+Silver, 45cm, engraving NIV, gift box
+```
+
+AI extraction:
 
 ```text
 Material: Silver
@@ -53,64 +67,77 @@ Gift box: Yes
 Confidence: 0.9
 ```
 
-Validation result:
+Validation:
 
 ```text
 Status: approved
 ```
 
-The workflow then creates a task in the ClickUp `Production Orders` list.
+Result: a production task is created in ClickUp.
 
-If the input is:
+## Example 2 – needs review
+
+Customer note:
 
 ```text
 Gold, engraving Dana
 ```
 
-the validation step detects that `size` is missing and sends the item to the Slack `#order-review` channel instead of sending it to production.
+AI extraction:
+
+```text
+Material: Gold
+Size: missing
+Engraving: Dana
+Gift box: No
+Confidence: 0.9
+```
+
+Validation:
+
+```text
+Status: needs_review
+Missing field: size
+```
+
+Result: the item is sent to the Slack `#order-review` channel for human review.
+
+## Estimated time saved
+
+The exact saving depends on the business and the order type.
+
+A simple manual process like reading the note, checking the details, creating a task, and notifying the team can easily take around 3–5 minutes per order item.
+
+If a store processes 50 custom order items in a day:
+
+```text
+50 items × 3 minutes = 150 minutes
+50 items × 5 minutes = 250 minutes
+```
+
+That is roughly 2.5–4 hours of repetitive work per day.
+
+This automation does not remove people from the process. It reduces the routine work and sends only incomplete or unclear orders for manual review.
+
+> The time estimate above is an example, not a measured production benchmark.
 
 ## Workflow
 
-```mermaid
-flowchart TD
-    A[Order Webhook] --> B[Loop Through Line Items]
-    B --> C[Build Unique Item Key]
-    C --> D[Find or Create Record in Zapier Tables]
-    D --> E{Already processed?}
-    E -->|Yes| X[Stop]
-    E -->|No| F[AI Extracts Customization Details]
-    F --> G[Validate Required Fields]
-    G --> H[Update Order Record]
-    H --> I{Validation Status}
-    I -->|approved| J[Create ClickUp Production Task]
-    J --> K[Set status: task_created]
-    I -->|needs_review| L[Send Slack Review Message]
-    L --> M[Set status: review_notified]
-    F -. error .-> N[Set status: failed]
-    J -. error .-> N
-    L -. error .-> N
-```
-
-
-## Screenshots
-
-### Zapier workflow
-
-The main workflow receives the order, processes each line item, blocks duplicates, extracts customization details with AI, validates the result, and routes the item to the correct next step.
-
 ![Zapier workflow](screenshots/zapier-workflow.jpg)
 
-### ClickUp production task
+The main flow handles order intake, item-by-item processing, duplicate protection, AI extraction, validation, routing, and error handling.
 
-When all required customization details are present, the workflow creates a production task in ClickUp automatically.
+## ClickUp – approved order
 
-![ClickUp production task](screenshots/clickup-production-task.svg)
+![ClickUp production task](screenshots/clickup-production-task.jpg)
 
-### Slack review notification
+When all required customization details are available, the workflow creates a production task in the `Production Orders` list.
 
-If required information is missing, the item is not sent to production. Instead, a message is sent to the `#order-review` Slack channel with the missing fields and validation reason.
+## Slack – manual review
 
-![Slack review notification](screenshots/slack-review-notification.svg)
+![Slack review notification](screenshots/slack-review-notification.jpg)
+
+When required information is missing, the workflow sends the order details, missing fields, and validation reason to Slack.
 
 ## Tools used
 
@@ -125,31 +152,55 @@ If required information is missing, the item is not sent to production. Instead,
 - Slack
 - Hoppscotch for webhook testing
 
-## Reliability
-
-The workflow includes a few safeguards:
+## Reliability and safeguards
 
 - Duplicate protection using a stable `order_id + line_item_id` key
-- Human review when required information is missing
-- No guessing of missing customization values
-- Status tracking in Zapier Tables
-- Native error handlers for AI, ClickUp, and Slack failures
+- AI only handles the free-text customization note
+- Missing values are not guessed
+- Required fields are validated before production
+- Human review is used when information is missing
+- Status changes are stored in Zapier Tables
+- Native error handlers mark failed AI, ClickUp, or Slack actions as `failed`
+
+## Status flow
+
+```text
+processing
+    ↓
+extracted_and_validated
+    ↓
+approved → task_created
+needs_review → review_notified
+
+error → failed
+```
 
 ## Test cases
 
-The workflow was tested with:
+The workflow was tested with three main scenarios:
 
-- A complete custom order → approved → ClickUp task created
-- An incomplete custom order → needs review → Slack notification sent
-- The same order sent twice → duplicate blocked before AI processing
+- Complete order → approved → ClickUp task created
+- Missing required field → needs review → Slack notification sent
+- Same item sent again → duplicate blocked before AI processing
 
-Sample payloads are available in the [examples](examples) folder.
+Sample webhook payloads are available in the [examples](examples) folder.
+
+The duplicate example intentionally uses the same order and line item IDs as the previous request. Sending it again demonstrates that the duplicate filter stops the item.
 
 ## Using it with a real store
 
-Hoppscotch was used to simulate incoming orders during development.
+Hoppscotch was used to simulate incoming orders while building and testing the workflow.
 
-In a real setup, the webhook trigger can be replaced with Shopify, WooCommerce, or another e-commerce platform. The rest of the workflow can stay almost the same as long as the incoming order fields are mapped correctly.
+In a real setup, the source can be replaced with Shopify, WooCommerce, or another e-commerce system that can send order data through a native Zapier trigger or webhook.
+
+The downstream logic can stay almost the same as long as these fields are mapped correctly:
+
+- order ID
+- line item ID
+- product name
+- SKU
+- quantity
+- customization notes
 
 ## Project structure
 
@@ -161,8 +212,26 @@ In a real setup, the webhook trigger can be replaced with Shopify, WooCommerce, 
 │   └── validate_customization.py
 ├── docs/
 │   └── workflow.md
-└── examples/
-    ├── approved-order.json
-    ├── needs-review-order.json
-    └── duplicate-order.json
+├── examples/
+│   ├── approved-order.json
+│   ├── needs-review-order.json
+│   └── duplicate-order.json
+└── screenshots/
+    ├── zapier-workflow.jpg
+    ├── clickup-production-task.jpg
+    └── slack-review-notification.jpg
 ```
+
+## What this project shows
+
+This project demonstrates practical work with:
+
+- API/webhook-based automation
+- AI extraction from unstructured text
+- validation logic
+- deduplication
+- branching workflows
+- human-in-the-loop review
+- status tracking
+- error handling
+- integrations between multiple business tools
