@@ -98,7 +98,7 @@ flowchart TD
 
 The main workflow receives the order, processes each line item, blocks duplicates, extracts customization details with AI, validates the result, and routes the item to the correct next step.
 
-![Zapier workflow](screenshots/zapier-workflow.svg)
+![Zapier workflow](screenshots/zapier-workflow.jpg)
 
 ### ClickUp production task
 
