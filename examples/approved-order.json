@@ -1,0 +1,13 @@
+{
+  "order_id": "ORD-1002",
+  "payment_status": "paid",
+  "items": [
+    {
+      "line_item_id": "LI-2001",
+      "product_name": "Custom Necklace",
+      "sku": "NECK-001",
+      "quantity": 1,
+      "customization_notes": "Silver, 45cm, engraving NIV, gift box"
+    }
+  ]
+}
